@@ -1,13 +1,16 @@
+from __future__ import annotations
+
 import json
 from pathlib import Path
 
 from src.election_model import NigerianElectionModel
 from src.quantum_election import QuantumElectionEngine
-from src.visualization import plot_party_support
+from src.visualization import plot_party_support, plot_zone_support
 
 
 def main():
     model = NigerianElectionModel()
+
     scenario = model.generate_scenario(
         turnout_bias=0.03,
         swing_factor=0.12,
@@ -34,6 +37,10 @@ def main():
     print(json.dumps(quantum_distribution, indent=2, sort_keys=True))
 
     plot_party_support(summary["national"])
+    plot_zone_support(summary["zones"])
+
+    output_dir = Path(__file__).resolve().parent / "output"
+    print(f"\nCharts saved to: {output_dir}")
 
 
 if __name__ == "__main__":

@@ -1,62 +1,39 @@
 from __future__ import annotations
 
-from typing import Dict
+from pathlib import Path
 
-import numpy as np
-
-try:
-    from qiskit import QuantumCircuit
-except ImportError:  # pragma: no cover
-    QuantumCircuit = None
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 
-class QuantumElectionEngine:
-    """Quantum-inspired election engine using amplitudes and probability amplitudes."""
+OUTPUT_DIR = Path(__file__).resolve().parents[1] / "output"
+OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
 
-    def __init__(self, support_distribution: Dict[str, float]):
-        self.support_distribution = self._normalize(support_distribution)
 
-    @staticmethod
-    def _normalize(distribution: Dict[str, float]) -> Dict[str, float]:
-        values = np.array(list(distribution.values()), dtype=float)
-        total = values.sum()
-        if total <= 0:
-            uniform = 1.0 / len(distribution)
-            return {party: uniform for party in distribution}
-        return {party: float(value / total) for party, value in distribution.items()}
+def plot_party_support(support_distribution: dict[str, float], title: str = "National Party Support") -> None:
+    labels = list(support_distribution.keys())
+    values = list(support_distribution.values())
 
-    def amplitude_vector(self) -> np.ndarray:
-        values = np.array(list(self.support_distribution.values()), dtype=float)
-        values = np.sqrt(values)
-        norm = np.linalg.norm(values)
-        if norm == 0:
-            return np.ones(len(values), dtype=float) / np.sqrt(len(values))
-        return values / norm
+    fig, ax = plt.subplots(figsize=(9, 6))
+    ax.bar(labels, values, color=["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"])
+    ax.set_title(title)
+    ax.set_ylabel("Support share")
+    ax.set_ylim(0, max(1.0, max(values) * 1.5))
+    ax.grid(axis="y", alpha=0.25)
+    plt.tight_layout()
+    plt.savefig(str(OUTPUT_DIR / "party_support.png"), dpi=200)
+    plt.close(fig)
 
-    def probability_distribution(self) -> Dict[str, float]:
-        amplitudes = self.amplitude_vector()
-        probabilities = np.abs(amplitudes) ** 2
-        total = probabilities.sum()
-        if total == 0:
-            return {party: 1 / len(self.support_distribution) for party in self.support_distribution}
-        probability_map = {party: float(p / total) for party, p in zip(self.support_distribution.keys(), probabilities)}
-        return probability_map
 
-    def interfere(self, phase_shift: float = 0.5) -> Dict[str, float]:
-        amplitudes = self.amplitude_vector()
-        phases = np.exp(1j * np.linspace(0.0, phase_shift, len(amplitudes)))
-        interfered = amplitudes * phases
-        probabilities = np.abs(interfered) ** 2
-        total = probabilities.sum()
-        if total == 0:
-            return {party: 1 / len(self.support_distribution) for party in self.support_distribution}
-        return {party: float(p / total) for party, p in zip(self.support_distribution.keys(), probabilities)}
-
-    def build_qiskit_circuit(self):
-        if QuantumCircuit is None:
-            return None
-
-        num_qubits = max(1, int(np.ceil(np.log2(len(self.support_distribution)))))
-        qc = QuantumCircuit(num_qubits)
-        qc.h(range(num_qubits))
-        return qc
+def plot_zone_support(zone_support: dict[str, dict[str, float]]) -> None:
+    fig, axes = plt.subplots(len(zone_support), 1, figsize=(10, 12), squeeze=False)
+    for idx, (zone, support) in enumerate(zone_support.items()):
+        parties = list(support.keys())
+        values = list(support.values())
+        axes[idx, 0].bar(parties, values, color=["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"])
+        axes[idx, 0].set_title(f"{zone} support")
+        axes[idx, 0].set_ylim(0, 1.0)
+    plt.tight_layout()
+    plt.savefig(str(OUTPUT_DIR / "zone_support.png"), dpi=200)
+    plt.close(fig)
