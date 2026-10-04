@@ -1,0 +1,18 @@
+{
+  "regions": [
+    "North West",
+    "North East",
+    "North Central",
+    "South West",
+    "South South",
+    "South East"
+  ],
+  "parties": [
+    "APC",
+    "PDP",
+    "LP",
+    "NNPP",
+    "Others"
+  ],
+  "notes": "Sample data structure for Nigerian electoral regions and parties."
+}

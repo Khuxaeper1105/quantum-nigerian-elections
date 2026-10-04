@@ -1,0 +1,67 @@
+import numpy as np
+
+
+class NigerianElectionModel:
+    """A probabilistic and quantum-inspired model for election outcomes in Nigeria."""
+
+    def __init__(self):
+        self.regions = {
+            "North West": {"turnout": 0.48, "swing": 0.08},
+            "North East": {"turnout": 0.45, "swing": 0.07},
+            "North Central": {"turnout": 0.50, "swing": 0.10},
+            "South West": {"turnout": 0.55, "swing": 0.12},
+            "South South": {"turnout": 0.52, "swing": 0.11},
+            "South East": {"turnout": 0.50, "swing": 0.09},
+        }
+
+        self.parties = ["APC", "PDP", "LP", "NNPP", "Others"]
+        self.base_support = {
+            "APC": 0.36,
+            "PDP": 0.33,
+            "LP": 0.18,
+            "NNPP": 0.08,
+            "Others": 0.05,
+        }
+
+    def generate_scenario(self, turnout_bias=0.0, swing_factor=0.0, uncertainty=0.0):
+        scenario = {}
+        for region, stats in self.regions.items():
+            turnout = stats["turnout"] + turnout_bias + np.random.normal(0, uncertainty)
+            turnout = max(0.25, min(0.75, turnout))
+
+            support = {}
+            for party, base in self.base_support.items():
+                delta = np.random.normal(0, swing_factor)
+                adjusted = base + delta * stats["swing"]
+                adjusted = max(0.05, min(0.65, adjusted))
+                support[party] = adjusted
+
+            # normalize to preserve total probability mass
+            total = sum(support.values())
+            support = {k: v / total for k, v in support.items()}
+            scenario[region] = {"turnout": turnout, "support": support}
+        return scenario
+
+    def simulate_election(self, scenario, trials=500):
+        region_results = {}
+
+        for region, data in scenario.items():
+            turnout = data["turnout"]
+            support = data["support"]
+            party_outcomes = {party: [] for party in support}
+
+            for _ in range(trials):
+                # Monte Carlo simulation of region-specific support under turnout uncertainty
+                noise = np.random.normal(0, 0.04)
+                effective_turnout = max(0.2, min(0.9, turnout + noise))
+
+                for party, prob in support.items():
+                    swing_noise = np.random.normal(0, 0.03)
+                    adjusted = max(0.01, prob + swing_noise)
+                    party_outcomes[party].append(effective_turnout * adjusted)
+
+            region_results[region] = {
+                party: float(np.mean(values)) for party, values in party_outcomes.items()
+            }
+
+        return region_results
