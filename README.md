@@ -4,16 +4,16 @@ A mathematical and quantum-inspired framework for modeling Nigerian election dyn
 
 ## Overview
 
-This project explores a realistic election simulation for Nigeria using:
-- classical probabilistic modeling
-- quantum-inspired state amplitudes
-- distribution of party support across regions
-- turnout and turnout volatility
-- uncertainty analysis across scenarios
+This project models a realistic Nigerian election system using:
+- statistical support distributions
+- stochastic turnout modeling
+- geopolitical zone weighting
+- quantum-inspired probability amplitudes
+- scenario analysis and Monte Carlo simulation
 
-The goal is not to predict actual real-world election outcomes with certainty, but to provide a structured simulation and research model for studying election behavior under uncertainty.
+The project is designed as an academic and engineering prototype, not as a definitive predictor of real election outcomes. It is meant to serve as a research model for quantifying uncertainty and exploring election behavior under probabilistic assumptions.
 
-## Project Structure
+## Repository structure
 
 ```text
 quantum-nigerian-elections/
@@ -25,32 +25,53 @@ quantum-nigerian-elections/
 │   ├── election_model.py
 │   ├── quantum_election.py
 │   └── visualization.py
-└── data/
-    └── sample_nigeria_regions.json
+├── data/
+│   └── sample_nigeria_regions.json
+└── .gitignore
 ```
 
-## Installation
+## Install
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate  # Linux/macOS
-# .venv\Scripts\activate   # Windows
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Usage
+## Run
 
 ```bash
 python main.py
 ```
 
-## Example Model Components
+## Model design
 
-- Regional support vectors for parties
-- Expected turnout rates by geopolitical zone
-- Quantum-style probability amplitudes for each party outcome
-- Monte Carlo scenario generation
-- Aggregate result summaries by region and party
+The model includes:
+- six geopolitical zones in Nigeria
+- vote-share distributions by party
+- region-specific weighting based on historical turnout patterns
+- probabilistic swing behavior
+- quantum-inspired interference using normalized amplitudes
+
+## Example output
+
+```text
+=== Nigerian Election Simulation ===
+{
+  "North West": {"APC": 0.31, ...},
+  "North East": {"PDP": 0.30, ...},
+  ...
+}
+
+=== National Summary ===
+{
+  "APC": 0.38,
+  "PDP": 0.32,
+  "LP": 0.16,
+  "NNPP": 0.09,
+  "Others": 0.05
+}
+```
 
 ## License
 

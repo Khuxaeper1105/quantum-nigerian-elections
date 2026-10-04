@@ -1,5 +1,35 @@
-qiskit>=0.45.0
-numpy>=1.23.0
-matplotlib>=3.7.0
-pandas>=2.0.0
-scipy>=1.11.0
+from __future__ import annotations
+
+from typing import Dict
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+
+def plot_party_support(support_distribution: Dict[str, float], title: str = "National Party Support") -> None:
+    labels = list(support_distribution.keys())
+    values = list(support_distribution.values())
+
+    fig, ax = plt.subplots(figsize=(9, 6))
+    ax.bar(labels, values, color=["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"])
+    ax.set_title(title)
+    ax.set_ylabel("Support share")
+    ax.set_ylim(0, max(1.0, max(values) * 1.5))
+    ax.grid(axis="y", alpha=0.25)
+    plt.tight_layout()
+    plt.savefig("output/party_support.png", dpi=200)
+    plt.close(fig)
+
+
+def plot_zone_support(zone_support: Dict[str, Dict[str, float]]) -> None:
+    fig, axes = plt.subplots(len(zone_support), 1, figsize=(10, 12), squeeze=False)
+    for idx, (zone, support) in enumerate(zone_support.items()):
+        parties = list(support.keys())
+        values = list(support.values())
+        axes[idx, 0].bar(parties, values)
+        axes[idx, 0].set_title(f"{zone} support")
+        axes[idx, 0].set_ylim(0, 1.0)
+    plt.tight_layout()
+    plt.savefig("output/zone_support.png", dpi=200)
+    plt.close(fig)
